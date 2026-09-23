@@ -47,5 +47,63 @@ namespace SoporteAcademico
 
             Console.WriteLine("Programa finalizado.");
         }
+
+        // ---------------------------------------------------------
+        // Req. 2: Valida que el código de estudiante no esté vacío
+        // y tenga al menos 5 caracteres
+        // ---------------------------------------------------------
+        static bool ValidarCodigoEstudiante(string codigo)
+        {
+            const int LONGITUD_MINIMA = 5;
+
+            if (string.IsNullOrWhiteSpace(codigo))
+                return false;
+
+            return codigo.Trim().Length >= LONGITUD_MINIMA;
+        }
+
+        // ---------------------------------------------------------
+        // Req. 3: Valida que el tipo de consulta esté dentro de
+        // la lista de tipos permitidos
+        // ---------------------------------------------------------
+        static bool ValidarTipoConsulta(string tipo)
+        {
+            string[] tiposValidos = { "matricula", "pagos", "constancia", "plataforma", "otro" };
+
+            if (string.IsNullOrWhiteSpace(tipo))
+                return false;
+
+            string tipoNormalizado = tipo.Trim().ToLower();
+
+            foreach (string t in tiposValidos)
+            {
+                if (t == tipoNormalizado)
+                    return true;
+            }
+            return false;
+        }
+
+        // ---------------------------------------------------------
+        // Req. 5: Asigna la prioridad de atención según el tipo
+        // de consulta recibido
+        // ---------------------------------------------------------
+        static string AsignarPrioridad(string tipoConsulta)
+        {
+            string tipo = tipoConsulta.Trim().ToLower();
+
+            switch (tipo)
+            {
+                case "plataforma":
+                case "pagos":
+                    return "Alta";
+                case "matricula":
+                    return "Media";
+                case "constancia":
+                case "otro":
+                    return "Baja";
+                default:
+                    return "Sin clasificar";
+            }
+        }
     }
 }
