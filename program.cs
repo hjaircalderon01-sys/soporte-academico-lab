@@ -23,10 +23,7 @@ namespace SoporteAcademico
 
             while (!salir)
             {
-                // Menú básico por ahora, sin función aparte todavía (eso llega en el Req. 4)
-                Console.WriteLine("=== SOPORTE ACADÉMICO - REGISTRO DE ATENCIONES ===");
-                Console.WriteLine("1. Registrar nueva solicitud");
-                Console.WriteLine("0. Salir");
+                MostrarMenu(); // Req. 4: ahora el menú vive en su propia función
 
                 Console.Write("Elige una opción: ");
                 string opcion = Console.ReadLine();
@@ -46,6 +43,16 @@ namespace SoporteAcademico
             }
 
             Console.WriteLine("Programa finalizado.");
+        }
+
+        // ---------------------------------------------------------
+        // Req. 4: Función SIN retorno para mostrar el menú principal
+        // ---------------------------------------------------------
+        static void MostrarMenu()
+        {
+            Console.WriteLine("=== SOPORTE ACADÉMICO - REGISTRO DE ATENCIONES ===");
+            Console.WriteLine("1. Registrar nueva solicitud");
+            Console.WriteLine("0. Salir");
         }
 
         // ---------------------------------------------------------
@@ -104,6 +111,33 @@ namespace SoporteAcademico
                 default:
                     return "Sin clasificar";
             }
+        }
+
+        // ---------------------------------------------------------
+        // Req. 6: Función CON retorno para validar texto obligatorio
+        // Recibe el texto y una longitud mínima (paso de parámetros)
+        // ---------------------------------------------------------
+        static bool ValidarTextoObligatorio(string texto, int longitudMinima)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return false;
+
+            return texto.Trim().Length >= longitudMinima;
+        }
+
+        // ---------------------------------------------------------
+        // Req. 7: Función SIN retorno para mostrar el resumen
+        // de una solicitud ya registrada
+        // ---------------------------------------------------------
+        static void MostrarResumenSolicitud(Solicitud s)
+        {
+            Console.WriteLine("----- Resumen de la solicitud -----");
+            Console.WriteLine($"Código estudiante : {s.CodigoEstudiante}");
+            Console.WriteLine($"Nombre            : {s.Nombre}");
+            Console.WriteLine($"Tipo de consulta  : {s.TipoConsulta}");
+            Console.WriteLine($"Descripción       : {s.Descripcion}");
+            Console.WriteLine($"Prioridad         : {s.Prioridad}");
+            Console.WriteLine("------------------------------------\n");
         }
     }
 }
