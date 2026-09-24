@@ -17,13 +17,13 @@ namespace SoporteAcademico
     {
         static void Main(string[] args)
         {
-            // Lista local del programa principal (Req. 1: base para registrar solicitudes)
+            // Lista local del programa principal (NO variable global) -> Req. 9
             List<Solicitud> solicitudes = new List<Solicitud>();
             bool salir = false;
 
             while (!salir)
             {
-                MostrarMenu(); // Req. 4: ahora el menú vive en su propia función
+                MostrarMenu();
 
                 Console.Write("Elige una opción: ");
                 string opcion = Console.ReadLine();
@@ -31,7 +31,11 @@ namespace SoporteAcademico
                 switch (opcion)
                 {
                     case "1":
-                        Console.WriteLine("(Registro de solicitud pendiente de implementar)\n");
+                        // La lista se pasa por parámetro, no se usa como variable global -> Req. 8
+                        RegistrarNuevaSolicitud(solicitudes);
+                        break;
+                    case "2":
+                        MostrarTodasLasSolicitudes(solicitudes);
                         break;
                     case "0":
                         salir = true;
@@ -52,6 +56,7 @@ namespace SoporteAcademico
         {
             Console.WriteLine("=== SOPORTE ACADÉMICO - REGISTRO DE ATENCIONES ===");
             Console.WriteLine("1. Registrar nueva solicitud");
+            Console.WriteLine("2. Ver solicitudes registradas");
             Console.WriteLine("0. Salir");
         }
 
@@ -115,7 +120,6 @@ namespace SoporteAcademico
 
         // ---------------------------------------------------------
         // Req. 6: Función CON retorno para validar texto obligatorio
-        // Recibe el texto y una longitud mínima (paso de parámetros)
         // ---------------------------------------------------------
         static bool ValidarTextoObligatorio(string texto, int longitudMinima)
         {
@@ -138,6 +142,74 @@ namespace SoporteAcademico
             Console.WriteLine($"Descripción       : {s.Descripcion}");
             Console.WriteLine($"Prioridad         : {s.Prioridad}");
             Console.WriteLine("------------------------------------\n");
+        }
+
+        // ---------------------------------------------------------------------
+        // Req. 8, 9, 10: Registra una nueva solicitud pidiendo datos por consola.
+        // La lista llega POR PARÁMETRO (Req. 8), nunca como variable global.
+        // 'nueva' es una variable LOCAL de esta función (Req. 9: alcance).
+        // Permite registrar cuantas solicitudes se quiera en una ejecución (Req. 10).
+        // ---------------------------------------------------------------------
+        static void RegistrarNuevaSolicitud(List<Solicitud> solicitudes)
+        {
+            Solicitud nueva = new Solicitud(); // variable local, no visible fuera de esta función
+
+            Console.Write("Código de estudiante: ");
+            nueva.CodigoEstudiante = Console.ReadLine();
+            if (!ValidarCodigoEstudiante(nueva.CodigoEstudiante))
+            {
+                Console.WriteLine("Código inválido (vacío o menor a 5 caracteres). Registro cancelado.\n");
+                return;
+            }
+
+            Console.Write("Nombre del estudiante: ");
+            nueva.Nombre = Console.ReadLine();
+            if (!ValidarTextoObligatorio(nueva.Nombre, 2))
+            {
+                Console.WriteLine("Nombre inválido. Registro cancelado.\n");
+                return;
+            }
+
+            Console.Write("Tipo de consulta (matricula, pagos, constancia, plataforma, otro): ");
+            nueva.TipoConsulta = Console.ReadLine();
+            if (!ValidarTipoConsulta(nueva.TipoConsulta))
+            {
+                Console.WriteLine("Tipo de consulta no reconocido. Registro cancelado.\n");
+                return;
+            }
+
+            Console.Write("Descripción breve: ");
+            nueva.Descripcion = Console.ReadLine();
+            if (!ValidarTextoObligatorio(nueva.Descripcion, 3))
+            {
+                Console.WriteLine("Descripción inválida. Registro cancelado.\n");
+                return;
+            }
+
+            nueva.Prioridad = AsignarPrioridad(nueva.TipoConsulta);
+
+            solicitudes.Add(nueva); // se agrega a la lista recibida por parámetro
+            Console.WriteLine("Solicitud registrada con éxito.\n");
+            MostrarResumenSolicitud(nueva);
+        }
+
+        // ---------------------------------------------------------------------
+        // Muestra todas las solicitudes registradas hasta el momento.
+        // También recibe la lista por parámetro (Req. 8).
+        // ---------------------------------------------------------------------
+        static void MostrarTodasLasSolicitudes(List<Solicitud> solicitudes)
+        {
+            if (solicitudes.Count == 0)
+            {
+                Console.WriteLine("Aún no hay solicitudes registradas.\n");
+                return;
+            }
+
+            Console.WriteLine($"Total de solicitudes registradas: {solicitudes.Count}\n");
+            foreach (Solicitud s in solicitudes)
+            {
+                MostrarResumenSolicitud(s);
+            }
         }
     }
 }
