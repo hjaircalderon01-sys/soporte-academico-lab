@@ -31,11 +31,13 @@ namespace SoporteAcademico
                 switch (opcion)
                 {
                     case "1":
-                        // La lista se pasa por parámetro, no se usa como variable global -> Req. 8
                         RegistrarNuevaSolicitud(solicitudes);
                         break;
                     case "2":
                         MostrarTodasLasSolicitudes(solicitudes);
+                        break;
+                    case "3":
+                        EjecutarPruebas(); // Req. 11
                         break;
                     case "0":
                         salir = true;
@@ -49,44 +51,32 @@ namespace SoporteAcademico
             Console.WriteLine("Programa finalizado.");
         }
 
-        // ---------------------------------------------------------
         // Req. 4: Función SIN retorno para mostrar el menú principal
-        // ---------------------------------------------------------
         static void MostrarMenu()
         {
             Console.WriteLine("=== SOPORTE ACADÉMICO - REGISTRO DE ATENCIONES ===");
             Console.WriteLine("1. Registrar nueva solicitud");
             Console.WriteLine("2. Ver solicitudes registradas");
+            Console.WriteLine("3. Ejecutar pruebas de validación");
             Console.WriteLine("0. Salir");
         }
 
-        // ---------------------------------------------------------
-        // Req. 2: Valida que el código de estudiante no esté vacío
-        // y tenga al menos 5 caracteres
-        // ---------------------------------------------------------
+        // Req. 2: Valida que el código de estudiante no esté vacío y tenga al menos 5 caracteres
         static bool ValidarCodigoEstudiante(string codigo)
         {
             const int LONGITUD_MINIMA = 5;
-
             if (string.IsNullOrWhiteSpace(codigo))
                 return false;
-
             return codigo.Trim().Length >= LONGITUD_MINIMA;
         }
 
-        // ---------------------------------------------------------
-        // Req. 3: Valida que el tipo de consulta esté dentro de
-        // la lista de tipos permitidos
-        // ---------------------------------------------------------
+        // Req. 3: Valida que el tipo de consulta esté dentro de la lista de tipos permitidos
         static bool ValidarTipoConsulta(string tipo)
         {
             string[] tiposValidos = { "matricula", "pagos", "constancia", "plataforma", "otro" };
-
             if (string.IsNullOrWhiteSpace(tipo))
                 return false;
-
             string tipoNormalizado = tipo.Trim().ToLower();
-
             foreach (string t in tiposValidos)
             {
                 if (t == tipoNormalizado)
@@ -95,14 +85,10 @@ namespace SoporteAcademico
             return false;
         }
 
-        // ---------------------------------------------------------
-        // Req. 5: Asigna la prioridad de atención según el tipo
-        // de consulta recibido
-        // ---------------------------------------------------------
+        // Req. 5: Asigna la prioridad de atención según el tipo de consulta recibido
         static string AsignarPrioridad(string tipoConsulta)
         {
             string tipo = tipoConsulta.Trim().ToLower();
-
             switch (tipo)
             {
                 case "plataforma":
@@ -118,21 +104,15 @@ namespace SoporteAcademico
             }
         }
 
-        // ---------------------------------------------------------
         // Req. 6: Función CON retorno para validar texto obligatorio
-        // ---------------------------------------------------------
         static bool ValidarTextoObligatorio(string texto, int longitudMinima)
         {
             if (string.IsNullOrWhiteSpace(texto))
                 return false;
-
             return texto.Trim().Length >= longitudMinima;
         }
 
-        // ---------------------------------------------------------
-        // Req. 7: Función SIN retorno para mostrar el resumen
-        // de una solicitud ya registrada
-        // ---------------------------------------------------------
+        // Req. 7: Función SIN retorno para mostrar el resumen de una solicitud
         static void MostrarResumenSolicitud(Solicitud s)
         {
             Console.WriteLine("----- Resumen de la solicitud -----");
@@ -144,15 +124,11 @@ namespace SoporteAcademico
             Console.WriteLine("------------------------------------\n");
         }
 
-        // ---------------------------------------------------------------------
-        // Req. 8, 9, 10: Registra una nueva solicitud pidiendo datos por consola.
-        // La lista llega POR PARÁMETRO (Req. 8), nunca como variable global.
-        // 'nueva' es una variable LOCAL de esta función (Req. 9: alcance).
-        // Permite registrar cuantas solicitudes se quiera en una ejecución (Req. 10).
-        // ---------------------------------------------------------------------
+        // Req. 8, 9, 10: Registra una nueva solicitud. La lista llega por parámetro (Req. 8),
+        // 'nueva' es variable local (Req. 9), y permite registrar cuantas solicitudes se quiera (Req. 10).
         static void RegistrarNuevaSolicitud(List<Solicitud> solicitudes)
         {
-            Solicitud nueva = new Solicitud(); // variable local, no visible fuera de esta función
+            Solicitud nueva = new Solicitud();
 
             Console.Write("Código de estudiante: ");
             nueva.CodigoEstudiante = Console.ReadLine();
@@ -188,15 +164,12 @@ namespace SoporteAcademico
 
             nueva.Prioridad = AsignarPrioridad(nueva.TipoConsulta);
 
-            solicitudes.Add(nueva); // se agrega a la lista recibida por parámetro
+            solicitudes.Add(nueva);
             Console.WriteLine("Solicitud registrada con éxito.\n");
             MostrarResumenSolicitud(nueva);
         }
 
-        // ---------------------------------------------------------------------
-        // Muestra todas las solicitudes registradas hasta el momento.
-        // También recibe la lista por parámetro (Req. 8).
-        // ---------------------------------------------------------------------
+        // Muestra todas las solicitudes registradas (recibe la lista por parámetro)
         static void MostrarTodasLasSolicitudes(List<Solicitud> solicitudes)
         {
             if (solicitudes.Count == 0)
@@ -210,6 +183,32 @@ namespace SoporteAcademico
             {
                 MostrarResumenSolicitud(s);
             }
+        }
+
+        // ---------------------------------------------------------------------
+        // Req. 11: Al menos 5 pruebas: datos válidos, datos vacíos,
+        // tipo de consulta incorrecto, prioridad alta y prioridad baja.
+        // ---------------------------------------------------------------------
+        static void EjecutarPruebas()
+        {
+            Console.WriteLine("===== EJECUTANDO PRUEBAS DE VALIDACIÓN =====\n");
+
+            bool p1 = ValidarCodigoEstudiante("EST001") && ValidarTipoConsulta("pagos");
+            Console.WriteLine($"Prueba 1 (datos válidos) - Esperado: True | Obtenido: {p1}");
+
+            bool p2 = ValidarCodigoEstudiante("");
+            Console.WriteLine($"Prueba 2 (código vacío) - Esperado: False | Obtenido: {p2}");
+
+            bool p3 = ValidarTipoConsulta("reclamo");
+            Console.WriteLine($"Prueba 3 (tipo inválido 'reclamo') - Esperado: False | Obtenido: {p3}");
+
+            string p4 = AsignarPrioridad("plataforma");
+            Console.WriteLine($"Prueba 4 (prioridad de 'plataforma') - Esperado: Alta | Obtenido: {p4}");
+
+            string p5 = AsignarPrioridad("constancia");
+            Console.WriteLine($"Prueba 5 (prioridad de 'constancia') - Esperado: Baja | Obtenido: {p5}");
+
+            Console.WriteLine("\n===== FIN DE PRUEBAS =====\n");
         }
     }
 }
